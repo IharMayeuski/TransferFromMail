@@ -19,18 +19,14 @@ public class EmailReceiver {
      */
     public static void getFilesFromEmail(String userName, String password) {
         // for POP3
-//        String protocol = "pop3";
-//        String host = "pop.gmail.com";
-//        String port = "995";
+        String protocol = "pop3";
+        String host = "pop." + userName.split("@")[1];
+        String port = "995";
 
         // for IMAP
-        String protocol = "imap";
-        String host = "imap.mail.ru";
-        String port = "993";
-
-
-//        String userName = "maevskij.i@gmail.com";
-//        String password = "Ii98729872gmail";
+//        String protocol = "imap";
+//        String port = "993";
+//        String host = "imap." + userName.split("@")[1];
 
         EmailReceiver receiver = new EmailReceiver();
         receiver.downloadEmails(protocol, host, port, userName, password);
@@ -55,7 +51,7 @@ public class EmailReceiver {
         properties.setProperty(String.format("mail.%s.socketFactory.class", protocol), "javax.net.ssl.SSLSocketFactory");
         properties.setProperty(String.format("mail.%s.socketFactory.fallback", protocol), "false");
         properties.setProperty(String.format("mail.%s.socketFactory.port", protocol), String.valueOf(port));
-        properties.put("mail.imap.ssl.trust", "*");
+        properties.put("mail.pop3.ssl.trust", "*");
         try {
             MailSSLSocketFactory sf = new MailSSLSocketFactory();
             sf.setTrustAllHosts(true);
