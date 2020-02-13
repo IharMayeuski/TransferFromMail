@@ -1,6 +1,9 @@
 package by.transfer.maevo;
 
 
+import by.transfer.maevo.service.Service;
+import by.transfer.maevo.service.ServiceFillScene;
+import by.transfer.maevo.util.EmailReceiver;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,7 +16,7 @@ import javafx.stage.Stage;
 
 import java.util.List;
 
-import static by.transfer.maevo.Constant.*;
+import static by.transfer.maevo.util.Constant.*;
 
 public class Main extends Application {
 
@@ -24,6 +27,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         ServiceFillScene fillSceneService = new ServiceFillScene();
+        EmailReceiver emailReceiver = new EmailReceiver();
         Service service = new Service();
         List<String> elements = service.getEmailList();
 
@@ -40,14 +44,13 @@ public class Main extends Application {
         fillSceneService.fillGrid(grid);
         fillSceneService.createButton(grid, button, 3);
 
-        button.setOnAction(event ->
-                System.out.println(langsComboBox.getValue()
+        button.setOnAction(event -> {
+                    emailReceiver.getFilesFromEmail(langsComboBox.getValue(), myMails.get(langsComboBox.getValue()));
 
-                ));
+                }
+        );
         stage.setTitle(TITLE_NAME);
         stage.setScene(scene);
         stage.show();
-
-
     }
 }
