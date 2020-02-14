@@ -1,9 +1,10 @@
 package by.transfer.maevo;
 
-
-import by.transfer.maevo.service.Service;
-import by.transfer.maevo.service.ServiceFillScene;
-import by.transfer.maevo.util.EmailReceiver;
+import by.transfer.maevo.Pojo.HostPortInfo;
+import by.transfer.maevo.Pojo.SessionStoreFolder;
+import by.transfer.maevo.facade.Facade;
+import by.transfer.maevo.facade.FacadeImpl;
+import by.transfer.maevo.facade.UtilClass;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,7 +15,9 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import javax.mail.*;
 import java.util.List;
+import java.util.Properties;
 
 import static by.transfer.maevo.util.Constant.*;
 
@@ -25,28 +28,51 @@ public class Main extends Application {
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
-        ServiceFillScene fillSceneService = new ServiceFillScene();
-        EmailReceiver emailReceiver = new EmailReceiver();
-        Service service = new Service();
-        List<String> elements = service.getEmailList();
+    public void start(Stage stage) {
+        UtilClass utilClass = new UtilClass();
+        FacadeImpl facade = new Facade();
 
-        ObservableList<String> langs = FXCollections.observableArrayList(elements);
-        ComboBox<String> langsComboBox = new ComboBox<>(langs);
-        langsComboBox.setValue(elements.get(0));
+        List<String> emails = utilClass.getEmailList();
+        List<String> protocols = utilClass.getProtocolList();
+
+        ObservableList<String> emailList = FXCollections.observableArrayList(emails);
+        ComboBox<String> emailBox = new ComboBox<>(emailList);
+        emailBox.setValue(emails.get(0));
+
+        ObservableList<String> protocolList = FXCollections.observableArrayList(protocols);
+        ComboBox<String> protocolBox = new ComboBox<>(protocolList);
+        protocolBox.setValue(protocols.get(0));
 
         GridPane grid = new GridPane();
-        Scene scene = new Scene(grid, 200, 160);
+        Scene scene = new Scene(grid, 300, 200);
         Button button = new Button(BUTTON_NAME);
 
-        grid.add(new FlowPane(150, 150, langsComboBox), 0, 2);
-        fillSceneService.fillScene(grid, SCENE_NAME);
-        fillSceneService.fillGrid(grid);
-        fillSceneService.createButton(grid, button, 3);
+        grid.add(new FlowPane(150, 150, emailBox), 0, 2);
+        grid.add(new FlowPane(150, 150, protocolBox), 0, 3);
+        utilClass.fillScene(grid, SCENE_NAME);
+        utilClass.fillGrid(grid);
+        utilClass.createButton(grid, button, 4);
 
-        button.setOnAction(event -> {
-                    emailReceiver.getFilesFromEmail(langsComboBox.getValue(), myMails.get(langsComboBox.getValue()));
+        button.setOnAction(
+                event -> {
+                    String protocol = protocolBox.getValue();
+                    String email = emailBox.getValue();
+                    String password = myMails.get(emailBox.getValue());
+                    HostPortInfo hostPortInfo = facade.getFilesFromEmail(email, password, protocol);
 
+                    Properties properties = utilClass.getServerProperties(
+                            protocol,
+                            hostPortInfo.getHost(),
+                            hostPortInfo.getPort(),
+                            hostPortInfo.getSslTrust()
+                    );
+
+                    SessionStoreFolder sessionStoreFolder = facade.getSessionStoreFolder(properties, protocol, email, password);
+                    Message[] messages = facade.getMessages(sessionStoreFolder);
+
+                    String destFilePath = "C:/Users/Maevskiy/Desktop/files/";
+                    facade.saveFile(messages, destFilePath);
+                    facade.closeSessionStoreFolder(sessionStoreFolder);
                 }
         );
         stage.setTitle(TITLE_NAME);

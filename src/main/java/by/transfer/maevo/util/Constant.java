@@ -1,6 +1,8 @@
 package by.transfer.maevo.util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Constant {
@@ -10,6 +12,12 @@ public class Constant {
     public final static Map<String, String> myMails = new HashMap<String, String>() {
         {
 *
+        }
+    };
+    public final static List <String> protocols = new ArrayList<String>() {
+        {
+            add("pop3");
+            add("imap");
         }
     };
 }
