@@ -66,6 +66,12 @@ public class Main extends Application {
                             hostPortInfo.getPort(),
                             hostPortInfo.getSslTrust()
                     );
+// TODO: 2/16/2020 imap moved files to basket, but pop3 deleted files totally from email post!!!
+                    // TODO: 2/16/2020 imap видит все папки через
+                    //  Folder [] folders = store.getDefaultFolder().list();
+                    //            for (Folder fold: folders) {
+                    //                System.out.println(fold.getName());
+                    //            }
 
                     SessionStoreFolder sessionStoreFolder = facade.getSessionStoreFolder(properties, protocol, email, password);
                     Message[] messages = facade.getMessages(sessionStoreFolder);
